@@ -5,22 +5,13 @@ import { Eye, Edit3, Columns, Download, Maximize2, Minimize2, Link as LinkIcon }
 import { cn } from '../lib/utils';
 import type { ViewMode } from '../types';
 
-const Editor = () => {
+export default function Editor() {
   const { notes, activeNoteId, updateNote, updateNoteTitle, setActiveNote } = useWorkspaceStore();
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
   const activeNote = notes.find((n: any) => n.id === activeNoteId);
   if (!activeNote) return null;
-
-  const downloadNote = () => {
-    const element = document.createElement("a");
-    const file = new Blob([activeNote.content], {type: 'text/markdown'});
-    element.href = URL.createObjectURL(file);
-    element.download = `${activeNote.title || 'note'}.md`;
-    document.body.appendChild(element);
-    element.click();
-  };
 
   return (
     <div className={cn("flex flex-col flex-1 bg-white dark:bg-zinc-950 transition-all", isFullscreen && "fixed inset-0 z-50")}>
@@ -38,7 +29,6 @@ const Editor = () => {
             <button onClick={() => setViewMode('split')} className={cn("p-1 rounded", viewMode === 'split' && "bg-white dark:bg-zinc-800 shadow-sm")}><Columns size={14} /></button>
             <button onClick={() => setViewMode('preview')} className={cn("p-1 rounded", viewMode === 'preview' && "bg-white dark:bg-zinc-800 shadow-sm")}><Eye size={14} /></button>
           </div>
-          <button onClick={downloadNote} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md"><Download size={14} /></button>
           <button onClick={() => setIsFullscreen(!isFullscreen)} className="p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-md">{isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}</button>
         </div>
       </div>
@@ -75,5 +65,4 @@ const Editor = () => {
       </div>
     </div>
   );
-};
-export default Editor;
+}
