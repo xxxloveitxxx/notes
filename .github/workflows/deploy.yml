@@ -2,16 +2,14 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ['main'] # Trigger on push to main branch
-  workflow_dispatch: # Allow manual trigger
+    branches: ['main']
+  workflow_dispatch:
 
-# Sets permissions for GITHUB_TOKEN to allow deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
 concurrency:
   group: 'pages'
   cancel-in-progress: true
@@ -34,13 +32,12 @@ jobs:
 
       - name: Build with Vite
         run: npm run build
-        env:
-          BASE: '/notes/' # Ensures base path is respected
+        # ✅ Remove the BASE env var — it's not needed if vite.config.ts is correct
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist' # Vite's default output folder
+          path: './dist'
 
   deploy:
     environment:
