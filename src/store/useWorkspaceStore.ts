@@ -35,36 +35,20 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         const newNote: Note = { id: crypto.randomUUID(), title, content: '', updatedAt: Date.now() };
         set((state) => ({ notes: [newNote, ...state.notes], activeNoteId: newNote.id }));
       },
-      updateNote: (id, content) => {
-        set((state) => ({ notes: state.notes.map((n) => n.id === id ? { ...n, content, updatedAt: Date.now() } : n) }));
-      },
-      updateNoteTitle: (id, title) => {
-        set((state) => ({ notes: state.notes.map((n) => n.id === id ? { ...n, title, updatedAt: Date.now() } : n) }));
-      },
-      deleteNote: (id) => {
-        set((state) => ({ notes: state.notes.filter((n) => n.id !== id), activeNoteId: state.activeNoteId === id ? null : state.activeNoteId }));
-      },
+      updateNote: (id, content) => set((state) => ({ notes: state.notes.map((n) => n.id === id ? { ...n, content, updatedAt: Date.now() } : n) })),
+      updateNoteTitle: (id, title) => set((state) => ({ notes: state.notes.map((n) => n.id === id ? { ...n, title, updatedAt: Date.now() } : n) })),
+      deleteNote: (id) => set((state) => ({ notes: state.notes.filter((n) => n.id !== id), activeNoteId: state.activeNoteId === id ? null : state.activeNoteId })),
       setActiveNote: (id) => set({ activeNoteId: id }),
       addTask: (text) => {
         const newTask: Task = { id: crypto.randomUUID(), text, completed: false, createdAt: Date.now() };
         set((state) => ({ tasks: [newTask, ...state.tasks] }));
-        if (text.length > 10 || text.includes('...') || text.includes('!')) {
-            get().smartExpandTask(newTask.id);
-        }
+        if (text.length > 10 || text.includes('...')) get().smartExpandTask(newTask.id);
       },
-      toggleTask: (id) => {
-        set((state) => ({ tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t) }));
-      },
-      deleteTask: (id) => {
-        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
-      },
-      toggleSubTask: (taskId, subtaskId) => {
-        set((state) => ({
-          tasks: state.tasks.map((t) =>
-            t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st: SubTask) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t
-          ),
-        }));
-      },
+      toggleTask: (id) => set((state) => ({ tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t) })),
+      deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
+      toggleSubTask: (taskId, subtaskId) => set((state) => ({
+          tasks: state.tasks.map((t) => t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st: SubTask) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t),
+      })),
       smartExpandTask: async (taskId) => {
         const task = get().tasks.find((t) => t.id === taskId);
         if (!task || task.subtasks?.length) return;
