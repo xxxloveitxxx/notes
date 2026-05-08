@@ -4,14 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   base: '/notes/',
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
 });
-tsconfig.json
-
-{
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
-}
