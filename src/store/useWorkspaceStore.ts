@@ -48,15 +48,21 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       addTask: (text) => {
         const newTask: Task = { id: crypto.randomUUID(), text, completed: false, createdAt: Date.now() };
         set((state) => ({ tasks: [newTask, ...state.tasks] }));
-        if (text.length > 10 || text.includes('...')) get().smartExpandTask(newTask.id);
+        if (text.length > 10 || text.includes('...') || text.includes('!')) {
+            get().smartExpandTask(newTask.id);
+        }
       },
       toggleTask: (id) => {
         set((state) => ({ tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t) }));
       },
-      deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
+      deleteTask: (id) => {
+        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
+      },
       toggleSubTask: (taskId, subtaskId) => {
         set((state) => ({
-          tasks: state.tasks.map((t) => t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st: SubTask) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t),
+          tasks: state.tasks.map((t) =>
+            t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st: SubTask) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t
+          ),
         }));
       },
       smartExpandTask: async (taskId) => {
