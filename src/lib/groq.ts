@@ -9,7 +9,7 @@ export interface AIResponse {
 }
 
 export async function decomposeTask(taskText: string, context: string): Promise<AIResponse> {
-  const prompt = `You are an expert productivity assistant. Context: "\${context}". Task: "\${taskText}". Respond ONLY with JSON: { "subtasks": [ { "text": "...", "how": "...", "duration": "..." } ] }`;
+  const prompt = `Decompose this task: "\${taskText}". Context: "\${context}". Output JSON: { "subtasks": [ { "text": "...", "how": "...", "duration": "..." } ] }`;
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
