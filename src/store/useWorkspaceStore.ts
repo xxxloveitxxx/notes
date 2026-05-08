@@ -48,19 +48,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       addTask: (text) => {
         const newTask: Task = { id: crypto.randomUUID(), text, completed: false, createdAt: Date.now() };
         set((state) => ({ tasks: [newTask, ...state.tasks] }));
-        if (text.length > 10 || text.includes('...') || text.includes('!')) {
-            get().smartExpandTask(newTask.id);
-        }
+        if (text.length > 10 || text.includes('...')) get().smartExpandTask(newTask.id);
       },
       toggleTask: (id) => {
         set((state) => ({ tasks: state.tasks.map((t) => t.id === id ? { ...t, completed: !t.completed } : t) }));
       },
-      deleteTask: (id) => {
-        set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) }));
-      },
+      deleteTask: (id) => set((state) => ({ tasks: state.tasks.filter((t) => t.id !== id) })),
       toggleSubTask: (taskId, subtaskId) => {
         set((state) => ({
-          tasks: state.tasks.map((t) => t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t),
+          tasks: state.tasks.map((t) => t.id === taskId ? { ...t, subtasks: t.subtasks?.map((st: SubTask) => st.id === subtaskId ? { ...st, completed: !st.completed } : st) } : t),
         }));
       },
       smartExpandTask: async (taskId) => {
@@ -69,8 +65,7 @@ export const useWorkspaceStore = create<WorkspaceState>()(
         set((state) => ({ tasks: state.tasks.map((t) => t.id === taskId ? { ...t, isAIExpanding: true } : t) }));
         try {
           const activeNote = get().notes.find(n => n.id === get().activeNoteId);
-          const context = activeNote ? `Note Title: ${activeNote.title}\nContent: ${activeNote.content}` : "No specific context.";
-          const result = await decomposeTask(task.text, context);
+          const result = await decomposeTask(task.text, activeNote?.content || "");
           const subtasks: SubTask[] = result.subtasks.map((st) => ({ id: crypto.randomUUID(), text: st.text, how: st.how, duration: st.duration, completed: false }));
           set((state) => ({ tasks: state.tasks.map((t) => t.id === taskId ? { ...t, subtasks, isAIExpanding: false } : t) }));
         } catch (error) {
