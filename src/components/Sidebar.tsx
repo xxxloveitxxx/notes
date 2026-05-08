@@ -1,9 +1,24 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { Plus, StickyNote, Trash2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export default function Sidebar() {
-  const { notes, activeNoteId, addNote, setActiveNote, deleteNote } = useWorkspaceStore();
+  const { notes, activeNoteId, addNote, setActiveNote, deleteNote } = useWorkspaceStore(
+    useShallow((state) => ({
+      // Map to unstable objects will still cause re-render if we don't handle it.
+      // However, we want to avoid re-rendering the sidebar when note CONTENT changes.
+      // Zustands useShallow will do a shallow equality check on the returned object.
+      // The 'notes' property here is a new array of new objects.
+      // To truly optimize, we should subscribe to a stable representation or individual components should subscribe.
+      // For now, mapping to just id/title is better than the whole note including large content.
+      notes: state.notes.map(({ id, title }) => ({ id, title })),
+      activeNoteId: state.activeNoteId,
+      addNote: state.addNote,
+      setActiveNote: state.setActiveNote,
+      deleteNote: state.deleteNote,
+    }))
+  );
   return (
     <div className="w-64 border-r border-zinc-200 dark:border-zinc-800 flex flex-col h-full bg-zinc-50 dark:bg-zinc-900/50">
       <div className="p-4 flex items-center justify-between font-bold text-lg">Workspace <button onClick={() => addNote()} className="hover:bg-zinc-200 dark:hover:bg-zinc-800 p-1 rounded"><Plus size={18}/></button></div>

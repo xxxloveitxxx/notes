@@ -1,11 +1,21 @@
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { Trash2, CheckCircle2, Circle, Sparkles, ChevronDown, ChevronRight, Clock, Info, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { Task, SubTask } from '../types';
 
 const Tasks = () => {
-  const { tasks, addTask, toggleTask, deleteTask, toggleSubTask, smartExpandTask } = useWorkspaceStore();
+  const { tasks, addTask, toggleTask, deleteTask, toggleSubTask, smartExpandTask } = useWorkspaceStore(
+    useShallow((state) => ({
+      tasks: state.tasks,
+      addTask: state.addTask,
+      toggleTask: state.toggleTask,
+      deleteTask: state.deleteTask,
+      toggleSubTask: state.toggleSubTask,
+      smartExpandTask: state.smartExpandTask,
+    }))
+  );
   const [expandedTasks, setExpandedTasks] = React.useState<Set<string>>(new Set());
 
   const toggleExpand = (id: string) => {
