@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { Eye, Edit3, Columns, Download, Maximize2, Minimize2, Link as LinkIcon } from 'lucide-react';
+import { Eye, Edit3, Columns, Maximize2, Minimize2, Link as LinkIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { ViewMode } from '../types';
 
