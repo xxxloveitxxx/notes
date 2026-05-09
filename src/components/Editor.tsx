@@ -1,16 +1,32 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Eye, Edit3, Columns, Maximize2, Minimize2, Link as LinkIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
-import type { ViewMode } from '../types';
+import type { ViewMode, Note } from '../types';
 
 export default function Editor() {
-  const { notes, activeNoteId, updateNote, updateNoteTitle, setActiveNote } = useWorkspaceStore();
+  // ⚡ Bolt Optimization: useShallow isolates this component from unrelated state
+  // changes (like tasks or dark mode).
+  const { notes, activeNoteId, updateNote, updateNoteTitle, setActiveNote } = useWorkspaceStore(
+    useShallow((state) => ({
+      notes: state.notes,
+      activeNoteId: state.activeNoteId,
+      updateNote: state.updateNote,
+      updateNoteTitle: state.updateNoteTitle,
+      setActiveNote: state.setActiveNote,
+    }))
+  );
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
-  const activeNote = notes.find((n: any) => n.id === activeNoteId);
+  // ⚡ Bolt Optimization: Memoize the active note lookup to avoid recalculating
+  // it on every render unless the notes array or activeNoteId changes.
+  const activeNote = React.useMemo(
+    () => notes.find((n: Note) => n.id === activeNoteId),
+    [notes, activeNoteId]
+  );
   if (!activeNote) return null;
 
   return (
@@ -50,7 +66,7 @@ export default function Editor() {
                     return (<p>{parts.map((part, i) => {
                           if (part.startsWith('[[') && part.endsWith(']]')) {
                             const title = part.slice(2, -2);
-                            const linkedNote = notes.find((n: any) => n.title.toLowerCase() === title.toLowerCase());
+                            const linkedNote = notes.find((n: Note) => n.title.toLowerCase() === title.toLowerCase());
                             return (<button key={i} onClick={() => linkedNote && setActiveNote(linkedNote.id)} className={cn("inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-sm font-medium transition-colors", linkedNote ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-200 dark:hover:bg-zinc-700" : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400")}>
                                 <LinkIcon size={12} />{title}</button>);
                           }
