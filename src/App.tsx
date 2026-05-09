@@ -7,7 +7,11 @@ import Timer from './components/Timer';
 import CommandPalette from './components/CommandPalette';
 
 function App() {
-  const { isDarkMode, activeNoteId, isFocusMode } = useWorkspaceStore();
+  // ⚡ Bolt Optimization: Use granular selectors to prevent re-rendering the entire App
+  // when unrelated state (like note content or tasks) changes.
+  const isDarkMode = useWorkspaceStore((state) => state.isDarkMode);
+  const activeNoteId = useWorkspaceStore((state) => state.activeNoteId);
+  const isFocusMode = useWorkspaceStore((state) => state.isFocusMode);
 
   useEffect(() => {
     if (isDarkMode) document.documentElement.classList.add('dark');

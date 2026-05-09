@@ -1,11 +1,23 @@
 import React from 'react';
 import { Command } from 'cmdk';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Plus, StickyNote, Moon, Sun, Search, Maximize2, Minimize2 } from 'lucide-react';
+import type { Note } from '../types';
 
 export default function CommandPalette() {
   const [open, setOpen] = React.useState(false);
-  const { notes, addNote, setActiveNote, toggleDarkMode, isDarkMode, isFocusMode, toggleFocusMode } = useWorkspaceStore();
+  const { notes, addNote, setActiveNote, toggleDarkMode, isDarkMode, isFocusMode, toggleFocusMode } = useWorkspaceStore(
+    useShallow((state) => ({
+      notes: state.notes,
+      addNote: state.addNote,
+      setActiveNote: state.setActiveNote,
+      toggleDarkMode: state.toggleDarkMode,
+      isDarkMode: state.isDarkMode,
+      isFocusMode: state.isFocusMode,
+      toggleFocusMode: state.toggleFocusMode,
+    }))
+  );
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => { if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); setOpen((o) => !o); } };
     document.addEventListener('keydown', down);
@@ -27,7 +39,7 @@ export default function CommandPalette() {
             <Command.Item onSelect={() => run(() => toggleFocusMode())} className="flex items-center gap-2 px-2 py-2 text-sm rounded-md cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 aria-selected:bg-zinc-100 dark:aria-selected:bg-zinc-800 transition-colors"> {isFocusMode ? <Minimize2 size={16} /> : <Maximize2 size={16} />} {isFocusMode ? 'Exit Focus Mode' : 'Enter Focus Mode'} </Command.Item>
           </Command.Group>
           <Command.Group heading="Notes" className="px-2 py-1 text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2 mb-1">
-            {notes.map((n: any) => ( <Command.Item key={n.id} onSelect={() => run(() => setActiveNote(n.id))} className="flex items-center gap-2 px-2 py-2 text-sm rounded-md cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 aria-selected:bg-zinc-100 dark:aria-selected:bg-zinc-800 transition-colors"> <StickyNote size={16} /> {n.title || 'Untitled'} </Command.Item> ))}
+            {notes.map((n: Note) => ( <Command.Item key={n.id} onSelect={() => run(() => setActiveNote(n.id))} className="flex items-center gap-2 px-2 py-2 text-sm rounded-md cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 aria-selected:bg-zinc-100 dark:aria-selected:bg-zinc-800 transition-colors"> <StickyNote size={16} /> {n.title || 'Untitled'} </Command.Item> ))}
           </Command.Group>
         </Command.List>
       </div>
