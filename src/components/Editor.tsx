@@ -1,12 +1,21 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { Eye, Edit3, Columns, Maximize2, Minimize2, Link as LinkIcon } from 'lucide-react';
 import { cn } from '../lib/utils';
 import type { ViewMode } from '../types';
 
 export default function Editor() {
-  const { notes, activeNoteId, updateNote, updateNoteTitle, setActiveNote } = useWorkspaceStore();
+  const { notes, activeNoteId, updateNote, updateNoteTitle, setActiveNote } = useWorkspaceStore(
+    useShallow((state) => ({
+      notes: state.notes,
+      activeNoteId: state.activeNoteId,
+      updateNote: state.updateNote,
+      updateNoteTitle: state.updateNoteTitle,
+      setActiveNote: state.setActiveNote,
+    }))
+  );
   const [viewMode, setViewMode] = React.useState<ViewMode>('split');
   const [isFullscreen, setIsFullscreen] = React.useState(false);
 
