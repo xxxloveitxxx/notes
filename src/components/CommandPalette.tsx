@@ -1,11 +1,30 @@
 import React from 'react';
 import { Command } from 'cmdk';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { Plus, StickyNote, Moon, Sun, Search, Maximize2, Minimize2 } from 'lucide-react';
 
 export default function CommandPalette() {
   const [open, setOpen] = React.useState(false);
-  const { notes, addNote, setActiveNote, toggleDarkMode, isDarkMode, isFocusMode, toggleFocusMode } = useWorkspaceStore();
+  const {
+    notes,
+    addNote,
+    setActiveNote,
+    toggleDarkMode,
+    isDarkMode,
+    isFocusMode,
+    toggleFocusMode,
+  } = useWorkspaceStore(
+    useShallow((state) => ({
+      notes: state.notes,
+      addNote: state.addNote,
+      setActiveNote: state.setActiveNote,
+      toggleDarkMode: state.toggleDarkMode,
+      isDarkMode: state.isDarkMode,
+      isFocusMode: state.isFocusMode,
+      toggleFocusMode: state.toggleFocusMode,
+    }))
+  );
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => { if (e.key === 'k' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); setOpen((o) => !o); } };
     document.addEventListener('keydown', down);
